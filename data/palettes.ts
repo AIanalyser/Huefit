@@ -1,0 +1,122 @@
+import { ColorPalette, SkinToneId } from "@/types";
+
+export const palettes: ColorPalette[] = [
+  // TONE_01 - Very Light
+  {
+    id: "PAL_01_SOFT",
+    toneId: "TONE_01",
+    setId: "soft-natural",
+    name: "Soft Blush & Neutrals",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#F5E6D3", "#E8D5C4", "#C9B8A8", "#A39081", "#8B7D6B", "#D4C5B9", "#BFB0A0", "#2C3E50", "#4A5568", "#1A1A2E"],
+  },
+  {
+    id: "PAL_01_VIB",
+    toneId: "TONE_01",
+    setId: "vibrant-rich",
+    name: "Rose & Jewel Tones",
+    description: "Bold and vibrant shades that complement very light skin tones beautifully.",
+    colors: ["#E8A0BF", "#D4789C", "#C44569", "#7B2D8E", "#4A1A6B", "#E85D75", "#C23152", "#8E1537", "#2D1B69", "#1B1464"],
+  },
+  // TONE_02 - Light
+  {
+    id: "PAL_02_SOFT",
+    toneId: "TONE_02",
+    setId: "soft-natural",
+    name: "Warm Sand & Earth",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#E8CDB5", "#D4B896", "#C4A67D", "#B8976B", "#9C8259", "#D4C4A8", "#BFB193", "#6B5B4E", "#4A3F35", "#2C2418"],
+  },
+  {
+    id: "PAL_02_VIB",
+    toneId: "TONE_02",
+    setId: "vibrant-rich",
+    name: "Coral & Ocean Blues",
+    description: "Bold and vibrant shades that complement light skin tones beautifully.",
+    colors: ["#FF7F7F", "#E85D75", "#C23152", "#2196F3", "#1565C0", "#FF6B6B", "#E84393", "#0D47A1", "#1A237E", "#0D1B3E"],
+  },
+  // TONE_03 - Light Medium
+  {
+    id: "PAL_03_SOFT",
+    toneId: "TONE_03",
+    setId: "soft-natural",
+    name: "Terracotta & Sage",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#D4A574", "#C4956A", "#B8845B", "#A87550", "#8B6B4A", "#8FBC8F", "#6B8E6B", "#4A6741", "#556B2F", "#2F4538"],
+  },
+  {
+    id: "PAL_03_VIB",
+    toneId: "TONE_03",
+    setId: "vibrant-rich",
+    name: "Crimson & Royal",
+    description: "Bold and vibrant shades that complement light medium skin tones beautifully.",
+    colors: ["#DC143C", "#B22222", "#8B0000", "#FF4500", "#CC3700", "#9B59B6", "#7D3C98", "#5B2C6F", "#4A235A", "#2C1445"],
+  },
+  // TONE_04 - Medium
+  {
+    id: "PAL_04_SOFT",
+    toneId: "TONE_04",
+    setId: "soft-natural",
+    name: "Golden Bronze & Olive",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#C19A6B", "#B8860B", "#A0784C", "#8B7355", "#6B5B4A", "#808000", "#6B8E23", "#556B2F", "#4A5D3A", "#2F3D2A"],
+  },
+  {
+    id: "PAL_04_VIB",
+    toneId: "TONE_04",
+    setId: "vibrant-rich",
+    name: "Amber & Teal",
+    description: "Bold and vibrant shades that complement medium skin tones beautifully.",
+    colors: ["#FF8C00", "#E67E22", "#D35400", "#CC7000", "#A85600", "#008080", "#00695C", "#004D40", "#00363A", "#002428"],
+  },
+  // TONE_05 - Deep
+  {
+    id: "PAL_05_SOFT",
+    toneId: "TONE_05",
+    setId: "soft-natural",
+    name: "Mahogany & Dusty Rose",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#BC8F8F", "#A0756E", "#8B6F65", "#7B6057", "#6B5249", "#C08081", "#A06060", "#804040", "#5C3030", "#3D1F1F"],
+  },
+  {
+    id: "PAL_05_VIB",
+    toneId: "TONE_05",
+    setId: "vibrant-rich",
+    name: "Sapphire & Gold",
+    description: "Bold and vibrant shades that complement deep skin tones beautifully.",
+    colors: ["#FFD700", "#DAA520", "#B8860B", "#0F52BA", "#0A3D8F", "#FFB700", "#E6A800", "#082567", "#051C4D", "#031233"],
+  },
+  // TONE_06 - Very Deep
+  {
+    id: "PAL_06_SOFT",
+    toneId: "TONE_06",
+    setId: "soft-natural",
+    name: "Deep Plum & Slate",
+    description: "Balanced neutrals and muted shades for a natural, effortless look.",
+    colors: ["#8E7CC3", "#7B6BAD", "#685A96", "#564A7F", "#443A68", "#708090", "#5F6F7E", "#4E5E6D", "#3D4D5C", "#2C3D4B"],
+  },
+  {
+    id: "PAL_06_VIB",
+    toneId: "TONE_06",
+    setId: "vibrant-rich",
+    name: "Emerald & Electric Blue",
+    description: "Bold and vibrant shades that complement very deep skin tones beautifully.",
+    colors: ["#00C853", "#00A844", "#008837", "#006B2B", "#004D1F", "#2962FF", "#2050CC", "#1A3FA0", "#142F75", "#0E1F4A"],
+  },
+];
+
+export function getPalettesForTone(toneId: SkinToneId): ColorPalette[] {
+  return palettes.filter((p) => p.toneId === toneId);
+}
+
+export function getPaletteById(id: string): ColorPalette | undefined {
+  return palettes.find((p) => p.id === id);
+}
+
+export function getSoftPalette(toneId: SkinToneId): ColorPalette | undefined {
+  return palettes.find((p) => p.toneId === toneId && p.setId === "soft-natural");
+}
+
+export function getVibrantPalette(toneId: SkinToneId): ColorPalette | undefined {
+  return palettes.find((p) => p.toneId === toneId && p.setId === "vibrant-rich");
+}
