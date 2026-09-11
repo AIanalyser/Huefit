@@ -7,6 +7,39 @@ import { AIProvider } from "./provider";
 import { buildOutfitPrompt } from "./buildOutfitPrompt";
 
 const HF_MODEL = "Qwen/Qwen-Image-Edit";
+const HF_PROVIDER = "fal-ai";
+
+const NEGATIVE_PROMPT = `
+new person,
+new human,
+realistic human face,
+facial features,
+eyes,
+nose,
+mouth,
+ears,
+hair,
+facial expression,
+identity change,
+different mannequin,
+different mannequin head,
+different body,
+different pose,
+different proportions,
+different camera,
+different composition,
+new outfit,
+redesigned clothing,
+added clothing,
+removed clothing,
+extra garments,
+extra accessories,
+background change,
+text,
+logo,
+watermark,
+photograph of a real person
+`;
 
 export class BFLProvider implements AIProvider {
   private client: InferenceClient;
@@ -45,8 +78,13 @@ export class BFLProvider implements AIProvider {
     try {
       console.log("[HF] Starting image editing");
       console.log(`[HF] Model: ${HF_MODEL}`);
+      console.log(`[HF] Provider: ${HF_PROVIDER}`);
+      console.log(`[HF] Template: ${selection.template_id}`);
       console.log(
-        `[HF] Template: ${selection.template_id}`
+        `[HF] Skin tone: ${selection.skin_tone.selected_hex}`
+      );
+      console.log(
+        `[HF] Garment colors: ${selection.color_palette.colors.join(", ")}`
       );
 
       const cleanBase64 = sourceImageBase64.replace(
@@ -62,16 +100,24 @@ export class BFLProvider implements AIProvider {
       const output = await this.client.imageToImage({
         model: HF_MODEL,
         inputs: inputImage,
-        prompt,
+        parameters: {
+          prompt,
+          negative_prompt: NEGATIVE_PROMPT,
+          guidance_scale: 7.5,
+          num_inference_steps: 30,
+          target_size: {
+            width: 1024,
+            height: 1536,
+          },
+        },
+        provider: HF_PROVIDER,
       });
 
       const outputBuffer = Buffer.from(
         await output.arrayBuffer()
       );
 
-      const imageBase64 = outputBuffer.toString(
-        "base64"
-      );
+      const imageBase64 = outputBuffer.toString("base64");
 
       console.log(
         "[HF] Image generation completed successfully"

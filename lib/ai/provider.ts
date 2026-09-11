@@ -5,44 +5,37 @@ import {
 } from "@/types";
 
 export interface AIProvider {
-  analyzeImage(
-    imageBase64: string
-  ): Promise<ColorAnalysisResult>;
-
+  analyzeImage(imageBase64: string): Promise<ColorAnalysisResult>;
   generateOutfit(
     selection: HueFitSelection,
-    sourceImageBase64?: string
+    sourceImageBase64?: string,
   ): Promise<GeneratedOutfitResult>;
 }
 
 export function getAIProvider(): AIProvider {
-  const bflApiKey = process.env.BFL_API_KEY || "";
+  const xaiApiKey = process.env.XAI_API_KEY || "";
+  const hfToken = process.env.HF_TOKEN || "";
   const geminiApiKey = process.env.GEMINI_API_KEY || "";
 
-  const hasBFL = bflApiKey.trim().length > 0;
+  const hasXAI = xaiApiKey.trim().length > 0;
+  const hasHF = hfToken.trim().length > 0;
   const hasGemini = geminiApiKey.trim().length > 0;
 
-  // ------------------------------------------------------------
-  // BFL / FLUX is the primary provider for outfit generation.
-  // ------------------------------------------------------------
+  // Grok is now the preferred image-generation provider.
+  if (hasXAI) {
+    const { GrokProvider } = require("./grok-provider");
+    return new GrokProvider();
+  }
 
-  if (hasBFL) {
+  if (hasHF) {
     const { BFLProvider } = require("./bfl-provider");
     return new BFLProvider();
   }
-
-  // ------------------------------------------------------------
-  // Gemini remains available when BFL is not configured.
-  // ------------------------------------------------------------
 
   if (hasGemini) {
     const { GeminiProvider } = require("./gemini-provider");
     return new GeminiProvider();
   }
-
-  // ------------------------------------------------------------
-  // Final fallback: demo provider.
-  // ------------------------------------------------------------
 
   const { DemoProvider } = require("./demo-provider");
   return new DemoProvider();

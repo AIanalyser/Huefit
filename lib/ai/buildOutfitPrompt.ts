@@ -1,7 +1,6 @@
 import { HueFitSelection } from "@/types";
 import { getGarmentRegions } from "@/data/garmentRegions";
 
-// ── Color naming ──────────────────────────────────────────────────────────────
 function hexToColorName(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -18,7 +17,8 @@ function hexToColorName(hex: string): string {
   const sat =
     max === min
       ? 0
-      : (max - min) / (l > 127 ? 510 - max - min : max + min);
+      : (max - min) /
+        (l > 127 ? 510 - max - min : max + min);
 
   if (sat < 0.08) {
     if (l < 80) return "dark charcoal grey";
@@ -44,10 +44,13 @@ function hexToColorName(hex: string): string {
   })();
 
   const pre =
-    l > 180 ? "light " :
-    l < 70 ? "deep " :
-    l < 110 ? "dark " :
-    "";
+    l > 180
+      ? "light "
+      : l < 70
+        ? "deep "
+        : l < 110
+          ? "dark "
+          : "";
 
   if (h < 15 || h >= 345) return `${pre}red`.trim();
   if (h < 30) return `${pre}red-orange`.trim();
@@ -68,9 +71,6 @@ function hexToColorName(hex: string): string {
   return `${pre}rose`.trim();
 }
 
-// ── Per-template garment structure description ────────────────────────────────
-// These descriptions describe the garment construction only.
-// The supplied dataset image remains the visual authority.
 function getOutfitDescription(
   templateId: string,
   outfitName: string
@@ -98,7 +98,7 @@ function getOutfitDescription(
       "a clean crew-neck cotton t-shirt, paired with slim-fit jeans with faint stitching and slight distressing at the knee",
 
     casual_m02:
-      "a piqué polo shirt with ribbed collar and two-button placket, paired with slim-fit chino trousers with a slight taper",
+      "a pique polo shirt with ribbed collar and two-button placket, paired with slim-fit chino trousers with a slight taper",
 
     casual_m03:
       "an open linen overshirt layered over a plain fitted t-shirt, paired with relaxed-fit trousers",
@@ -173,7 +173,6 @@ function getOutfitDescription(
   );
 }
 
-// ── Main prompt builder ───────────────────────────────────────────────────────
 export function buildOutfitPrompt(
   selection: HueFitSelection
 ): string {
@@ -182,7 +181,7 @@ export function buildOutfitPrompt(
 
   let colorInstructions = "";
 
-  if (regions && regions.regions && regions.regions.length > 0) {
+  if (regions?.regions?.length) {
     colorInstructions = regions.regions
       .map((region) => {
         const idx = Math.min(
@@ -209,11 +208,8 @@ export function buildOutfitPrompt(
       `Secondary garment colour: ${c2}`;
   }
 
-  const gender =
-    selection.gender === "male" ? "male" : "female";
-
-  const skinToneHex = selection.skin_tone.selected_hex;
   const skinToneName = selection.skin_tone.label;
+  const skinToneHex = selection.skin_tone.selected_hex;
 
   const outfit = getOutfitDescription(
     selection.template_id,
@@ -221,241 +217,148 @@ export function buildOutfitPrompt(
   );
 
   return `
-EDIT THE PROVIDED DATASET IMAGE.
+EDIT THE PROVIDED HUEFIT DATASET IMAGE.
 
-The supplied image is the AUTHORITATIVE BASE IMAGE for this generation.
+SOURCE IMAGE:
+The supplied image is the exact base image.
+Edit the existing image. Do not create a new image composition.
 
-DO NOT create a new person.
-DO NOT redesign the outfit.
-DO NOT replace the mannequin.
-DO NOT generate a new pose.
-DO NOT generate a different camera angle.
-DO NOT change the composition.
+PRIMARY EDIT:
+1. Recolor the existing garment regions using the exact colors below.
+2. Recolor the existing mannequin surface using the exact surface-tone HEX below.
+3. Preserve the original mannequin, clothing structure, pose and composition.
 
-The goal is to take the supplied HueFit dataset template image and make a controlled fashion color edit based on the user's selections.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-BASE IMAGE PRESERVATION — CRITICAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Preserve the supplied dataset image as closely as possible.
-
-Keep EXACTLY the same:
-
-- mannequin body
-- mannequin proportions
-- mannequin pose
-- head shape
-- faceless appearance
-- arms
-- hands
-- legs
-- feet
-- garment silhouettes
-- garment shapes
-- garment layering
-- garment construction
-- collars
-- lapels
-- sleeves
-- cuffs
-- waistbands
-- pockets
-- seams
-- hems
-- draping
-- footwear
-- camera position
-- camera angle
-- framing
-- image composition
-- studio background
-- lighting direction
-- shadows
-- overall image structure
-
-The supplied dataset image is more important than the textual outfit description.
-
-The text description exists only to help identify garment regions.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MANNEQUIN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-The mannequin represents a ${gender} fashion mannequin.
-
-Apply the requested mannequin skin/surface tone:
-
-Skin tone:
-${skinToneName}
-
-Reference HEX:
-${skinToneHex}
-
-Change ONLY the mannequin surface tone if necessary.
-
-The mannequin must remain:
-
-- completely faceless
-- featureless
-- without eyes
-- without nose
-- without mouth
-- without ears
-- without hair
-- without facial expression
-
-Do not turn the mannequin into a real identifiable human.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OUTFIT TEMPLATE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Template ID:
-${selection.template_id}
-
-Outfit:
-${selection.outfit_name}
-
-Garment structure:
-${outfit}
-
-IMPORTANT:
-
-The garment structure already exists in the supplied dataset image.
-
-DO NOT invent additional garments.
-DO NOT remove existing garments.
-DO NOT change the garment design.
-DO NOT change the garment proportions.
-DO NOT change the garment silhouette.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EXACT USER COLOR SELECTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Apply these exact colors to the corresponding garment regions:
-
+GARMENT COLORS:
 ${colorInstructions}
 
-These HEX values are the user's selected colors.
+IMPORTANT GARMENT RULE:
+The HEX values above are the user's exact selected colors.
+Apply each HEX color directly to its corresponding existing garment region.
 
-The HEX values have priority over generic color names.
+Do not redesign the garments.
+Do not change garment shapes.
+Do not add garments.
+Do not remove garments.
 
-Use the exact selected color on the corresponding garment.
+SURFACE TONE EDIT:
+Target: EXISTING MANNEQUIN SURFACE ONLY.
 
-Preserve realistic:
+Selected surface tone:
+${skinToneName}
 
+EXACT SURFACE-TONE HEX:
+${skinToneHex}
+
+Change the color of the existing mannequin material toward EXACT HEX ${skinToneHex}.
+
+This is a MATERIAL COLOR EDIT of the existing mannequin surface.
+
+Preserve:
+- existing mannequin geometry
+- existing head shape
+- existing body proportions
+- existing pose
+- existing shading
+- existing highlights
+- existing shadows
+- existing studio lighting
+
+Do not replace the existing mannequin.
+
+The head must remain completely smooth and featureless.
+Do not add eyes.
+Do not add a nose.
+Do not add a mouth.
+Do not add hair.
+Do not add facial details.
+
+The surface-tone edit must not affect the clothing colors.
+
+EXISTING OUTFIT:
+${selection.outfit_name}
+
+EXISTING GARMENT STRUCTURE:
+${outfit}
+
+The garment structure shown in the supplied image is authoritative.
+Use the image itself as the reference for garment shape and construction.
+
+PRESERVE THE ORIGINAL:
+- same mannequin
+- same head
+- same body
+- same proportions
+- same pose
+- same arms
+- same hands
+- same legs
+- same feet
+- same garments
+- same garment silhouettes
+- same garment layering
+- same garment construction
+- same collars
+- same sleeves
+- same lapels
+- same cuffs
+- same waistbands
+- same seams
+- same folds
+- same footwear
+- same camera
+- same framing
+- same background
+- same lighting
+- same shadows
+- same composition
+
+COLOR EDITING:
+Only perform the requested color changes.
+
+Garments:
+Apply the exact selected garment HEX values to the mapped garment regions.
+
+Mannequin:
+Apply the exact selected surface-tone HEX to the existing mannequin surface.
+
+Preserve natural:
 - fabric texture
 - folds
+- wrinkles
 - highlights
 - shadows
 - seams
 - stitching
-- wrinkles
-- material response
+- material depth
 
-The selected color must naturally follow the existing lighting and fabric shading.
-
-Do NOT make the garments look like flat digital color blocks.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-COLOR EDITING RULE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-This is a COLOR EDIT of an existing dataset image.
-
-The original garment's geometry must remain unchanged.
-
-Replace the original garment color with the requested color while preserving:
-
-- fabric texture
-- natural highlights
-- natural shadows
-- folds
-- wrinkles
-- seams
-- stitching
-- depth
-- realistic material appearance
-
-Do not recolor:
-
-- background
-- floor
-- shadows outside the garments
-- mannequin body
-- face/head surface
-- hands
-- arms
-- legs
-- shoes unless explicitly specified as a garment region
-
-Only the requested garment regions should receive the selected colors.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-VISUAL CONSISTENCY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-The final image must look like the SAME dataset mannequin photographed in the SAME studio.
-
-It should appear that the clothing was originally manufactured in the selected colors.
-
-Do NOT make it look like:
-
-- AI generated redesign
-- a different mannequin
-- a different photograph
-- a different fashion model
-- a different pose
-- a different outfit
-- a pasted color layer
-- a flat recolor
-- a cartoon
-- an illustration
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STRICT NEGATIVE INSTRUCTIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do not make clothing look like flat digital blocks.
 
 DO NOT:
-
-- create a new mannequin
-- create a human face
-- add eyes
-- add a nose
-- add a mouth
-- add hair
-- add ears
+- replace the mannequin
+- change the mannequin geometry
 - change the pose
 - change body proportions
 - change camera angle
 - change framing
 - change background
-- change garment design
-- change garment silhouette
-- add garments
-- remove garments
-- add accessories not already present
+- redesign clothing
+- add clothing
+- remove clothing
+- add accessories
 - add text
 - add logos
 - add watermarks
-- add props
-- add scenery
 - crop the image
-- distort hands
-- create extra limbs
-- change the dataset composition
-- replace the dataset image with a newly generated fashion photograph
+- add facial details
+- add hair
 
-FINAL PRIORITY:
+FINAL RESULT:
+The output must look like the SAME HueFit dataset image after a precise color customization.
 
-1. Preserve the supplied dataset image.
-2. Preserve the existing outfit structure.
-3. Apply the selected mannequin skin tone.
-4. Apply the exact selected HEX colors to the correct garment regions.
-5. Preserve realistic fabric lighting, shadows and texture.
+The clothing must use the selected garment colors.
 
-The final result must look like the original HueFit dataset template after a precise professional color customization.
+The existing mannequin surface must use the selected surface-tone HEX.
+
+Everything else should remain visually consistent with the supplied dataset image.
 `;
 }
